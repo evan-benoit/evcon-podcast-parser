@@ -10,3 +10,5 @@ override.tf.json
 *_override.tf.json
 tf/deployment-lambda-hello.zip
 tf/response.json
+src/lambda/hello/.venv
+src/lambda/hello/__pycache__/

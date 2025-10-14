@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Debug Lambda",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/lambda/hello/test.py",
+      "console": "integratedTerminal",
+      "python": "${workspaceFolder}/src/lambda/hello/.venv/bin/python"
+    }
+  ]
+}
