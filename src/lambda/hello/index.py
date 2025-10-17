@@ -24,10 +24,10 @@ def handler(event, context):
     tags = {}
     factChecks = {}
 
-    # summary = get_summary(transcript)
-    # takeAways = get_takeaways(transcript, 5)
-    # quotes = get_quotes(transcript, 2)
-    # tags = get_tags(transcript, "tags.json")
+    summary = get_summary(transcript)
+    takeAways = get_takeaways(transcript, 5)
+    quotes = get_quotes(transcript, 2)
+    tags = get_tags(transcript, "tags.json")
     factChecks = fact_check(transcript)
 
     returnJson = {"summary": summary, 
