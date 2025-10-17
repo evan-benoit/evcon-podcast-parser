@@ -28,5 +28,5 @@ resource "aws_lambda_function" "api" {
   source_code_hash = filebase64sha256("deployment-lambda-hello.zip")
 
   memory_size = 512
-  timeout     = 10
+  timeout     = 60
 }
