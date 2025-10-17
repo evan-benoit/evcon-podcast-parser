@@ -1,6 +1,7 @@
 import boto3
 import json
 import unicodedata
+import os
 
 
 bedrock = boto3.client("bedrock-runtime", region_name="us-east-1")
@@ -16,8 +17,12 @@ def handler(event, context):
     summary = get_summary(transcript)
     takeAways = get_takeaways(transcript, 5)
     quotes = get_quotes(transcript, 2)
+    tags = get_tags(transcript, "tags.json")
 
-    returnJson = {"summary": summary, "takeAways": takeAways, "quotes": quotes}
+    returnJson = {"summary": summary, 
+                  "takeAways": takeAways, 
+                  "quotes": quotes,
+                  "tags": tags}
 
     return {
         "statusCode": 200,
@@ -121,6 +126,56 @@ def get_quotes(transcript, num=5):
         return []
 
     return quotes_json["quotes"]
+
+import json
+
+def get_tags(transcript: str, tags_file="tags.json"):
+    # Load allowed tags
+    tags_path = os.path.join(os.path.dirname(__file__), tags_file)
+    with open(tags_path, "r") as f:
+        tags_data = json.load(f)
+    allowed_tags = tags_data.get("tags", [])
+
+    # Build prompt
+    prompt = f"""
+        You are tagging a podcast transcript.
+
+        Instructions:
+        - Select the most relevant tags from the provided list.
+        - Only use tags from the list. Do not invent new tags.
+        - Return ONLY valid JSON in this format:
+        {{
+        "topics": [
+            "Tag1",
+            "Tag2",
+            "Tag3"
+        ]
+        }}
+
+        Available tags:
+        {allowed_tags}
+
+        Transcript:
+        <<<
+        {transcript}
+        >>>
+        """
+
+    # Call LLM
+    response = invoke_model(prompt)
+    result = json.loads(response['body'].read())
+    output_text = result["content"][0]["text"]
+
+    # Parse JSON
+    tags_json = json.loads(output_text)
+
+    # Validate against allowed list
+    for tag in tags_json.get("topics", []):
+        if tag not in allowed_tags:
+            raise ValueError(f"Invalid tag returned: {tag}")
+
+    return tags_json
+
 
 
 def normalize(s: str) -> str:
