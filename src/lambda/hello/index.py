@@ -28,9 +28,6 @@ def get_summary(transcript):
     output_text = result["content"][0]["text"]
     return output_text
 
-import json
-
-
 def get_takeaways(transcript, num_takeaways=5):
     prompt = f"""
         You are an assistant that extracts the top {num_takeaways} takeaways from a podcast transcript.
