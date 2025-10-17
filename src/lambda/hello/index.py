@@ -25,10 +25,10 @@ def handler(event, context):
     factChecks = {}
 
     summary = get_summary(transcript)
-    takeAways = get_takeaways(transcript, 5)
-    quotes = get_quotes(transcript, 2)
-    tags = get_tags(transcript, "tags.json")
-    factChecks = fact_check(transcript)
+    # takeAways = get_takeaways(transcript, 5)
+    # quotes = get_quotes(transcript, 2)
+    # tags = get_tags(transcript, "tags.json")
+    # factChecks = fact_check(transcript)
 
     returnJson = {"summary": summary, 
                   "takeAways": takeAways, 
@@ -42,7 +42,7 @@ def handler(event, context):
     }
 
 def get_summary(transcript):
-    prompt = f"Summarize the following podcast transcript excerpt in 200-300 words:\n\n{transcript}"
+    prompt = f"Summarize the following podcast transcript excerpt in 200-300 words, capturing core themes, key discussions, and outcomes or opinions shared:\n\n{transcript}"
     response = invoke_model(prompt)
     result = json.loads(response['body'].read())
     output_text = result["content"][0]["text"]
