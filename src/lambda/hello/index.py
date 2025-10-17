@@ -1,5 +1,7 @@
 import boto3
 import json
+import unicodedata
+
 
 bedrock = boto3.client("bedrock-runtime", region_name="us-east-1")
 
@@ -13,8 +15,9 @@ def handler(event, context):
     
     summary = get_summary(transcript)
     takeAways = get_takeaways(transcript, 5)
+    quotes = get_quotes(transcript, 2)
 
-    returnJson = {"summary": summary, "takeAways": takeAways}
+    returnJson = {"summary": summary, "takeAways": takeAways, "quotes": quotes}
 
     return {
         "statusCode": 200,
@@ -28,9 +31,9 @@ def get_summary(transcript):
     output_text = result["content"][0]["text"]
     return output_text
 
-def get_takeaways(transcript, num_takeaways=5):
+def get_takeaways(transcript, num=5):
     prompt = f"""
-        You are an assistant that extracts the top {num_takeaways} takeaways from a podcast transcript.
+        You are an assistant that extracts the top {num} takeaways from a podcast transcript.
 
         Instructions:
         - Output ONLY valid JSON.
@@ -60,9 +63,79 @@ def get_takeaways(transcript, num_takeaways=5):
         start = output_text.find("{")
         end = output_text.rfind("}") + 1
         takeaways_json = json.loads(output_text[start:end])
+    
+    # Validate that we have the correct number of takeaways
+    if len(takeaways_json.get("takeaways", [])) != num:
+        return []
 
     return takeaways_json["takeaways"]
 
+
+def get_quotes(transcript, num=5):
+    prompt = f"""
+       Extract notable quotes from the following podcast transcript.
+
+        Instructions:
+        - Return ONLY valid JSON.
+        - Each quote must be verbatim from the transcript.
+        - Each quote must include:
+        - "timestamp" (the time code, if available in the transcript)
+        - "text" (the exact verbatim quote)
+        - Return {num} notable quotes, no commentary.
+
+            Return ONLY valid JSON in this format:
+            {{
+            "quotes": [
+                {{
+                "timestamp": "00:12:34",
+                "speaker": "Guest",
+                "text": "Remote work isn’t just a perk anymore — it’s the new baseline expectation."
+                }}
+            ]
+            }}      
+
+        Transcript:
+        <<<
+        {transcript}
+        >>>
+        """
+    response = invoke_model(prompt)
+    result = json.loads(response['body'].read())
+    output_text = result["content"][0]["text"]
+
+    # Parse Claude’s JSON output safely
+    try:
+        quotes_json = json.loads(output_text)
+    except json.JSONDecodeError:
+        # If Claude adds extra text, try to recover JSON substring
+        start = output_text.find("{")
+        end = output_text.rfind("}") + 1
+        quotes_json = json.loads(output_text[start:end])
+
+    # Validate quotes are verbatim.  If they are not, return empty list.
+    # if not validate_quotes(transcript, quotes_json):
+        # return []
+
+    # Validate that we have the correct number of quotes
+    if len(quotes_json.get("quotes", [])) != num:
+        return []
+
+    return quotes_json["quotes"]
+
+
+def normalize(s: str) -> str:
+    # Convert to NFKC form and replace smart quotes/apostrophes
+    s = unicodedata.normalize("NFKC", s)
+    return s.replace("’", "'").replace("“", '"').replace("”", '"')
+
+
+def validate_quotes(transcript: str, quotes_json: dict) -> bool:
+    norm_transcript = normalize(transcript)
+    for quote in quotes_json.get("quotes", []):
+        text = normalize(quote.get("text", ""))
+        if text not in norm_transcript:
+            return False
+    return True
 
 
 def invoke_model(prompt):
