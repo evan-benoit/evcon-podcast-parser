@@ -145,7 +145,7 @@ def get_tags(transcript: str, tags_file="tags.json"):
         - Only use tags from the list. Do not invent new tags.
         - Return ONLY valid JSON in this format:
         {{
-        "topics": [
+        "tags": [
             "Tag1",
             "Tag2",
             "Tag3"
@@ -169,10 +169,8 @@ def get_tags(transcript: str, tags_file="tags.json"):
     # Parse JSON
     tags_json = json.loads(output_text)
 
-    # Validate against allowed list
-    for tag in tags_json.get("topics", []):
-        if tag not in allowed_tags:
-            raise ValueError(f"Invalid tag returned: {tag}")
+    # Validate against allowed list (drop invalids)
+    tags_json["tags"] = [tag for tag in tags_json.get("tags", []) if tag in allowed_tags]
 
     return tags_json
 
