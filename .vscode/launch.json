@@ -7,7 +7,8 @@
       "request": "launch",
       "program": "${workspaceFolder}/src/lambda/hello/test.py",
       "console": "integratedTerminal",
-      "python": "${workspaceFolder}/src/lambda/hello/.venv/bin/python"
+      "python": "${workspaceFolder}/src/lambda/hello/.venv/bin/python",
+      "args": ["/Users/evanbenoit/Documents/git/personal/evcon-rmind-infra/sample/ep001_remote_work.json"]
     }
   ]
 }
