@@ -227,8 +227,7 @@ def verify_claim(claim: str):
         - Return ONLY valid JSON.
         - The "verification" field MUST be EXACTLY one of these four strings (copy/paste, do not invent your own):
         - "Verified true"
-        - "Possibly outdated"
-        - "Possibly inaccurate"
+        - "Possibly outdated/inaccurate"
         - "Unverifiable"
         - Do not add symbols, checkmarks, emojis, or extra words.
         - Include "confidence" as a float between 0.0 and 1.0.
