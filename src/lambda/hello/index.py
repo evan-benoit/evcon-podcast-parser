@@ -134,6 +134,7 @@ def validate_quotes(transcript: str, quotes_json: dict) -> bool:
     for quote in quotes_json.get("quotes", []):
         text = normalize(quote.get("text", ""))
         if text not in norm_transcript:
+            #If it fails, fall back to an LLM check that can say “close enough.”
             return False
     return True
 
