@@ -17,29 +17,37 @@ def handler(event, context):
             "body": json.dumps({"error": "Transcript not provided"})
         }
     
-    # set all return values to blank/defaults
-    summary = ""
-    takeAways = []
-    quotes = []
-    tags = {}
-    factChecks = {}
+    try:
+        # set all return values to blank/defaults
+        summary = ""
+        takeAways = []
+        quotes = []
+        tags = {}
+        factChecks = {}
 
-    summary = get_summary(transcript)
-    # takeAways = get_takeaways(transcript, 5)
-    # quotes = get_quotes(transcript, 2)
-    # tags = get_tags(transcript, "tags.json")
-    # factChecks = fact_check(transcript)
+        summary = get_summary(transcript)
+        # takeAways = get_takeaways(transcript, 5)
+        # quotes = get_quotes(transcript, 2)
+        # tags = get_tags(transcript, "tags.json")
+        # factChecks = fact_check(transcript)
 
-    returnJson = {"summary": summary, 
-                  "takeAways": takeAways, 
-                  "quotes": quotes,
-                  "tags": tags,
-                  "factChecks": factChecks}
+        returnJson = {"summary": summary, 
+                    "takeAways": takeAways, 
+                    "quotes": quotes,
+                    "tags": tags,
+                    "factChecks": factChecks}
 
-    return {
-        "statusCode": 200,
-        "body": json.dumps(returnJson)
-    }
+        return {
+            "statusCode": 200,
+            "body": json.dumps(returnJson)
+        }
+    except Exception as e:
+        # Log stack trace for debugging and return a 500 to the caller
+        print(traceback.format_exc())
+        return {
+            "statusCode": 500,
+            "body": json.dumps({"error": "Internal server error", "message": str(e)})
+        }
 
 def get_summary(transcript):
     prompt = f"Summarize the following podcast transcript excerpt in 200-300 words, capturing core themes, key discussions, and outcomes or opinions shared:\n\n{transcript}"
