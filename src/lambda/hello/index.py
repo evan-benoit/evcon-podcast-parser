@@ -43,7 +43,7 @@ def handler(event, context):
         logger.info("Takeaways extraction completed: " + json.dumps(takeAways)[:100])
 
         logger.info("Starting quotes extraction")
-        # quotes = get_quotes(transcript, 2)
+        quotes = get_quotes(transcript, 2)
         logger.info("Quotes extraction completed: " + json.dumps(quotes)[:100])
         
         logger.info("Starting tags extraction")
@@ -51,7 +51,7 @@ def handler(event, context):
         logger.info("Tags extraction completed: " + json.dumps(tags)[:100])
         
         logger.info("Starting fact checking")
-        factChecks = fact_check(transcript)
+        # factChecks = fact_check(transcript)
         logger.info("Fact checking completed: " + json.dumps(factChecks)[:100])
 
         returnJson = {"summary": summary, 
@@ -117,7 +117,7 @@ def get_quotes(transcript, num=5):
 
         Instructions:
         - Return ONLY valid JSON.
-        - Each quote must be verbatim from the transcript.
+        - Each quote should be verbatim from the transcript, except you may remove filler words and fix transcription errors
         - Each quote must include:
         - "timestamp" (the time code, if available in the transcript)
         - "text" (the exact verbatim quote)
@@ -153,7 +153,7 @@ def get_quotes(transcript, num=5):
 
             # next, try calling an LLM to verify the quote
             verify_prompt = f"""
-            Does the following quote appear verbatim in the transcript below?
+            Does the following quote appear in the transcript below?
             Quote: "{quote.get("text")}"
             Transcript:
             <<<
