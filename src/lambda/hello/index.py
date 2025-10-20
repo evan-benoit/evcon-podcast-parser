@@ -91,7 +91,7 @@ def handler(event, context):
         logger.info("Tags extraction completed: " + json.dumps(tags)[:100])
         
         logger.info("Starting fact checking")
-        # factChecks = fact_check(transcript)
+        factChecks = fact_check(transcript)
         logger.info("Fact checking completed: " + json.dumps(factChecks)[:100])
 
         returnJson = {"summary": summary, 
@@ -315,15 +315,19 @@ def verify_claim(claim: str):
         
         - Do not add symbols, checkmarks, emojis, or extra words.
         - Include "confidence" as a float between 0.0 and 1.0.
+        - Include a URL for the validation source
 
         Output format:
         {{
         "claim": "...",
         "verification": "...",
         "confidence": 0.0
+        "source": "..."
         }}
         """
-    response = invoke_model(prompt)
+    
+    # Call LLM, using a different model (so we're not using the same model for claim extraction and verification)
+    response = invoke_model(prompt, model="anthropic.claude-3-haiku-20240307-v1:0")
     result = json.loads(response['body'].read())
     output_text = result["content"][0]["text"]
     return json.loads(output_text)
@@ -355,9 +359,9 @@ def fact_check(transcript: str):
     return { "facts": verifications }
 
 
-def invoke_model(prompt, retries=5):
+def invoke_model(prompt, retries=5, model="anthropic.claude-3-sonnet-20240229-v1:0"):
     payload = {
-        "modelId": "anthropic.claude-3-sonnet-20240229-v1:0",  # or other Claude model IDs
+        "modelId": model ,  # or other Claude model IDs
         "accept": "application/json",
         "contentType": "application/json",
         "body": json.dumps({
