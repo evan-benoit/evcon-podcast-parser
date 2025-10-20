@@ -43,7 +43,7 @@ def handler(event, context):
         logger.info("Takeaways extraction completed: " + json.dumps(takeAways)[:100])
 
         logger.info("Starting quotes extraction")
-        quotes = get_quotes(transcript, 2)
+        # quotes = get_quotes(transcript, 2)
         logger.info("Quotes extraction completed: " + json.dumps(quotes)[:100])
         
         logger.info("Starting tags extraction")
@@ -51,7 +51,7 @@ def handler(event, context):
         logger.info("Tags extraction completed: " + json.dumps(tags)[:100])
         
         logger.info("Starting fact checking")
-        # factChecks = fact_check(transcript)
+        factChecks = fact_check(transcript)
         logger.info("Fact checking completed: " + json.dumps(factChecks)[:100])
 
         returnJson = {"summary": summary, 
@@ -252,6 +252,7 @@ def extract_claims(transcript: str):
     claims_json = safe_parse_json(output_text)
     return claims_json.get("claims", [])
 
+VERIFICATION_RESULT = ["Verified true", "Possibly outdated/inaccurate", "Unverifiable"]
 
 def verify_claim(claim: str):
     prompt = f"""
@@ -263,10 +264,9 @@ def verify_claim(claim: str):
 
         Instructions:
         - Return ONLY valid JSON.
-        - The "verification" field MUST be EXACTLY one of these four strings (copy/paste, do not invent your own):
-        - "Verified true"
-        - "Possibly outdated/inaccurate"
-        - "Unverifiable"
+        - The "verification" field MUST be EXACTLY one of these strings (copy/paste, do not invent your own):
+             {VERIFICATION_RESULT}
+        
         - Do not add symbols, checkmarks, emojis, or extra words.
         - Include "confidence" as a float between 0.0 and 1.0.
 
@@ -291,7 +291,7 @@ def fact_check(transcript: str):
         verification = verify_claim(claim)
 
         # make sure the verification field has one of the expected values
-        valid_verifications = ["Verified true", "Possibly outdated/inaccurate", "Unverifiable"]
+        valid_verifications = VERIFICATION_RESULT
         if verification.get("verification") not in valid_verifications:
             logger.error(f"Invalid verification result for claim '{claim}': {verification.get('verification')}")
             #skip this claim
