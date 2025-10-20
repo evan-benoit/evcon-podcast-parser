@@ -8,7 +8,34 @@ import botocore
 import logging
 import re
 import traceback
+from jsonschema import validate, ValidationError
 
+transcript_schema = {
+    "type": "object",
+    "properties": {
+        "episode_id": {"type": "string"},
+        "title": {"type": "string"},
+        "host": {"type": "string"},
+        "guests": {
+            "type": "array",
+            "items": {"type": "string"}
+        },
+        "transcript": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "timestamp": {"type": "string"},
+                    "speaker": {"type": "string"},
+                    "section": {"type": "string"},
+                    "text": {"type": "string"}
+                },
+                "required": ["timestamp", "speaker", "text"]
+            }
+        }
+    },
+    "required": ["episode_id", "title", "host", "guests", "transcript"]
+}
 
 bedrock = boto3.client("bedrock-runtime", region_name="us-east-1")
 
@@ -21,6 +48,14 @@ def handler(event, context):
         return {
             "statusCode": 400,
             "body": json.dumps({"error": "Transcript not provided"})
+        }
+    
+    # Validate transcript schema
+    is_valid, error_msg = validate_transcript(transcript)
+    if not is_valid:
+        return {
+            "statusCode": 400,
+            "body": json.dumps({"error": "Invalid transcript format", "message": error_msg})
         }
     
     # log the length and first 100 letters of the transcript
@@ -71,6 +106,14 @@ def handler(event, context):
             "statusCode": 500,
             "body": json.dumps({"error": "Internal server error", "message": str(e)})
         }
+
+def validate_transcript(data):
+    try:
+        validate(instance=data, schema=transcript_schema)
+        return True, None
+    except ValidationError as e:
+        return False, str(e)
+
 
 def get_summary(transcript):
     prompt = f"Summarize the following podcast transcript excerpt in 200-300 words, capturing core themes, key discussions, and outcomes or opinions shared:\n\n{transcript}"

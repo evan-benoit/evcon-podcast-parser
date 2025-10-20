@@ -13,3 +13,4 @@ tf/response.json
 src/lambda/hello/.venv
 src/lambda/hello/__pycache__/
 src/lambda/hello/response.json
+.DS_Store
