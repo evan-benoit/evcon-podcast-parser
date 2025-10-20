@@ -37,19 +37,19 @@ def handler(event, context):
         logger.info("Summary generation completed: " + json.dumps(summary)[:100])
 
         logger.info("Starting takeaways extraction")
-        # takeAways = get_takeaways(transcript, 5)
+        takeAways = get_takeaways(transcript, 5)
         logger.info("Takeaways extraction completed: " + json.dumps(takeAways)[:100])
 
         logger.info("Starting quotes extraction")
-        # quotes = get_quotes(transcript, 2)
+        quotes = get_quotes(transcript, 2)
         logger.info("Quotes extraction completed: " + json.dumps(quotes)[:100])
         
         logger.info("Starting tags extraction")
-        # tags = get_tags(transcript, "tags.json")
+        tags = get_tags(transcript, "tags.json")
         logger.info("Tags extraction completed: " + json.dumps(tags)[:100])
         
         logger.info("Starting fact checking")
-        # factChecks = fact_check(transcript)
+        factChecks = fact_check(transcript)
         logger.info("Fact checking completed: " + json.dumps(factChecks)[:100])
 
         returnJson = {"summary": summary, 
@@ -100,15 +100,7 @@ def get_takeaways(transcript, num=5):
     response = invoke_model(prompt)
     result = json.loads(response['body'].read())
     output_text = result["content"][0]["text"]
-
-    # Parse Claude’s JSON output safely
-    try:
-        takeaways_json = json.loads(output_text)
-    except json.JSONDecodeError:
-        # If Claude adds extra text, try to recover JSON substring
-        start = output_text.find("{")
-        end = output_text.rfind("}") + 1
-        takeaways_json = json.loads(output_text[start:end])
+    takeaways_json = safe_parse_json(output_text)
     
     # Validate that we have the correct number of takeaways
     if len(takeaways_json.get("takeaways", [])) != num:
@@ -148,15 +140,7 @@ def get_quotes(transcript, num=5):
     response = invoke_model(prompt)
     result = json.loads(response['body'].read())
     output_text = result["content"][0]["text"]
-
-    # Parse Claude’s JSON output safely
-    try:
-        quotes_json = json.loads(output_text)
-    except json.JSONDecodeError:
-        # If Claude adds extra text, try to recover JSON substring
-        start = output_text.find("{")
-        end = output_text.rfind("}") + 1
-        quotes_json = json.loads(output_text[start:end])
+    quotes_json = safe_parse_json(output_text)
 
     # Validate quotes are verbatim.  If they are not, return empty list.
     # if not validate_quotes(transcript, quotes_json):
@@ -206,9 +190,7 @@ def get_tags(transcript: str, tags_file="tags.json"):
     response = invoke_model(prompt)
     result = json.loads(response['body'].read())
     output_text = result["content"][0]["text"]
-
-    # Parse JSON
-    tags_json = json.loads(output_text)
+    tags_json = safe_parse_json(output_text)
 
     # Validate against allowed list (drop invalids)
     tags_json["tags"] = [tag for tag in tags_json.get("tags", []) if tag in allowed_tags]
@@ -240,7 +222,7 @@ def extract_claims(transcript: str):
     response = invoke_model(prompt)
     result = json.loads(response['body'].read())
     output_text = result["content"][0]["text"]
-    claims_json = json.loads(output_text)
+    claims_json = safe_parse_json(output_text)
     return claims_json.get("claims", [])
 
 
@@ -327,3 +309,13 @@ def invoke_model(prompt, retries=5):
             else:
                 raise
     raise RuntimeError(f"invoke_model failed after {retries} retries due to throttling.")
+
+
+def safe_parse_json(text: str):
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        # If the model adds extra text, recover JSON substring
+        start = text.find("{")
+        end = text.rfind("}") + 1
+        return json.loads(text[start:end])
