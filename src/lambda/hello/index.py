@@ -6,6 +6,8 @@ import time
 import random
 import botocore
 import logging
+import re
+import traceback
 
 
 bedrock = boto3.client("bedrock-runtime", region_name="us-east-1")
@@ -41,7 +43,7 @@ def handler(event, context):
         logger.info("Takeaways extraction completed: " + json.dumps(takeAways)[:100])
 
         logger.info("Starting quotes extraction")
-        # quotes = get_quotes(transcript, 2)
+        quotes = get_quotes(transcript, 2)
         logger.info("Quotes extraction completed: " + json.dumps(quotes)[:100])
         
         logger.info("Starting tags extraction")
@@ -49,7 +51,7 @@ def handler(event, context):
         logger.info("Tags extraction completed: " + json.dumps(tags)[:100])
         
         logger.info("Starting fact checking")
-        factChecks = fact_check(transcript)
+        # factChecks = fact_check(transcript)
         logger.info("Fact checking completed: " + json.dumps(factChecks)[:100])
 
         returnJson = {"summary": summary, 
@@ -141,18 +143,43 @@ def get_quotes(transcript, num=5):
     result = json.loads(response['body'].read())
     output_text = result["content"][0]["text"]
     quotes_json = safe_parse_json(output_text)
+    quotes = []
 
-    # Validate quotes are verbatim.  If they are not, return empty list.
-    # if not validate_quotes(transcript, quotes_json):
-        # return []
+    # Confirm that each quote is in the transcript, and not hallucinated
+    for quote in quotes_json.get("quotes", []):
+        
+        #first we'll do a simple substring check, since it's faster
+        if normalize(quote.get("text", "")) not in normalize(json.dumps(transcript)):
 
-    # Validate that we have the correct number of quotes
-    if len(quotes_json.get("quotes", [])) != num:
-        return []
+            # next, try calling an LLM to verify the quote
+            verify_prompt = f"""
+            Does the following quote appear verbatim in the transcript below?
+            Quote: "{quote.get("text")}"
+            Transcript:
+            <<<
+            {json.dumps(transcript, ensure_ascii=False)}
+            >>>
+            Answer "Yes" or "No" only.
+            """
+            verify_response = invoke_model(verify_prompt)
+            verify_result = json.loads(verify_response['body'].read())
+            verify_output_text = verify_result["content"][0]["text"].strip().lower()
+            if "yes" not in verify_output_text:
+                logger.error(f"Quote not verified by LLM: {quote.get('text')}")
+                continue  # skip this quote
+
+        # If we reach here, the quote is valid
+        quotes.append(quote)
+
 
     return quotes_json["quotes"]
 
-import json
+# helper function to normalize strings for comparison
+def normalize(s: str) -> str:
+    if not s:
+        return ""
+    return re.sub(r'[^a-z0-9]', '', s.lower())
+
 
 def get_tags(transcript: str, tags_file="tags.json"):
     # Load allowed tags
@@ -280,22 +307,6 @@ def fact_check(transcript: str):
         verifications.append(verification)
         logger.info(f"Verification result: {verifications[-1]}")
     return { "facts": verifications }
-
-
-def normalize(s: str) -> str:
-    # Convert to NFKC form and replace smart quotes/apostrophes
-    s = unicodedata.normalize("NFKC", s)
-    return s.replace("’", "'").replace("“", '"').replace("”", '"')
-
-
-def validate_quotes(transcript: str, quotes_json: dict) -> bool:
-    norm_transcript = normalize(transcript)
-    for quote in quotes_json.get("quotes", []):
-        text = normalize(quote.get("text", ""))
-        if text not in norm_transcript:
-            #If it fails, fall back to an LLM check that can say “close enough.”
-            return False
-    return True
 
 
 def invoke_model(prompt, retries=5):
