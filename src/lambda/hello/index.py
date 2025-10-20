@@ -37,19 +37,19 @@ def handler(event, context):
         logger.info("Summary generation completed: " + json.dumps(summary)[:100])
 
         logger.info("Starting takeaways extraction")
-        takeAways = get_takeaways(transcript, 5)
+        # takeAways = get_takeaways(transcript, 5)
         logger.info("Takeaways extraction completed: " + json.dumps(takeAways)[:100])
 
         logger.info("Starting quotes extraction")
-        quotes = get_quotes(transcript, 2)
+        # quotes = get_quotes(transcript, 2)
         logger.info("Quotes extraction completed: " + json.dumps(quotes)[:100])
         
         logger.info("Starting tags extraction")
-        tags = get_tags(transcript, "tags.json")
+        # tags = get_tags(transcript, "tags.json")
         logger.info("Tags extraction completed: " + json.dumps(tags)[:100])
         
         logger.info("Starting fact checking")
-        factChecks = fact_check(transcript)
+        # factChecks = fact_check(transcript)
         logger.info("Fact checking completed: " + json.dumps(factChecks)[:100])
 
         returnJson = {"summary": summary, 
@@ -315,7 +315,11 @@ def safe_parse_json(text: str):
     try:
         return json.loads(text)
     except json.JSONDecodeError:
-        # If the model adds extra text, recover JSON substring
+        # Maybe the model added some extra text, so try recovering a JSON substring
         start = text.find("{")
         end = text.rfind("}") + 1
-        return json.loads(text[start:end])
+        try:
+            return json.loads(text[start:end])
+        except Exception:
+            logger.error("LLM returned invalid JSON.  LLM Response: %s", text)
+            return {}
