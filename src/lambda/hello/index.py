@@ -10,6 +10,7 @@ import re
 import traceback
 from jsonschema import validate, ValidationError
 
+# Define the expected schema for the transcript input
 transcript_schema = {
     "type": "object",
     "properties": {
@@ -37,11 +38,15 @@ transcript_schema = {
     "required": ["episode_id", "title", "host", "guests", "transcript"]
 }
 
-bedrock = boto3.client("bedrock-runtime", region_name="us-east-1")
+# Define verification result constants
+VERIFICATION_RESULT = ["Verified true", "Possibly outdated/inaccurate", "Unverifiable"]
 
+# set up some libraries
+bedrock = boto3.client("bedrock-runtime", region_name="us-east-1")
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+# this is the main entry point for the lambda
 def handler(event, context):
     transcript = event.get("transcript")
     if not transcript:
@@ -295,8 +300,6 @@ def extract_claims(transcript: str):
     claims_json = safe_parse_json(output_text)
     return claims_json.get("claims", [])
 
-VERIFICATION_RESULT = ["Verified true", "Possibly outdated/inaccurate", "Unverifiable"]
-
 def verify_claim(claim: str):
     prompt = f"""
         You are a fact-checking assistant with access to external sources.
@@ -383,6 +386,7 @@ def invoke_model(prompt, retries=5):
     raise RuntimeError(f"invoke_model failed after {retries} retries due to throttling.")
 
 
+# helper to safely parse JSON, with some recovery attempts
 def safe_parse_json(text: str):
     try:
         return json.loads(text)
