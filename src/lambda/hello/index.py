@@ -33,7 +33,7 @@ def handler(event, context):
         factChecks = {}
 
         logger.info("Starting summary generation")
-        summary = get_summary(transcript)
+        # summary = get_summary(transcript)
         logger.info("Summary generation completed: " + json.dumps(summary)[:100])
 
         logger.info("Starting takeaways extraction")
@@ -49,7 +49,7 @@ def handler(event, context):
         logger.info("Tags extraction completed: " + json.dumps(tags)[:100])
         
         logger.info("Starting fact checking")
-        # factChecks = fact_check(transcript)
+        factChecks = fact_check(transcript)
         logger.info("Fact checking completed: " + json.dumps(factChecks)[:100])
 
         returnJson = {"summary": summary, 
@@ -260,7 +260,25 @@ def fact_check(transcript: str):
     claims = extract_claims(transcript)
     verifications = []
     for claim in claims:
-        verifications.append(verify_claim(claim))
+        logger.info(f"Fact-checking claim: {claim}")
+        verification = verify_claim(claim)
+
+        # make sure the verification field has one of the expected values
+        valid_verifications = ["Verified true", "Possibly outdated/inaccurate", "Unverifiable"]
+        if verification.get("verification") not in valid_verifications:
+            logger.error(f"Invalid verification result for claim '{claim}': {verification.get('verification')}")
+            #skip this claim
+            continue
+
+        #make sure the verification has confidence between 0.0 and 1.0
+        confidence = verification.get("confidence", -1.0)
+        if not isinstance(confidence, (float, int)) or not (0.0 <= confidence <= 1.0):
+            logger.error(f"Invalid confidence value for claim '{claim}': {confidence}")
+            #skip this claim
+            continue
+
+        verifications.append(verification)
+        logger.info(f"Verification result: {verifications[-1]}")
     return { "facts": verifications }
 
 
@@ -320,6 +338,8 @@ def safe_parse_json(text: str):
         end = text.rfind("}") + 1
         try:
             return json.loads(text[start:end])
+        
+        #The LLM returned garbage we can’t salvage
         except Exception:
-            logger.error("LLM returned invalid JSON.  LLM Response: %s", text)
+            logger.error("If You Don't Like My Output, Blame Your Prompting Skills.  LLM Response: %s", text)
             return {}
