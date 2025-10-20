@@ -75,11 +75,11 @@ def handler(event, context):
         factChecks = {}
 
         logger.info("Starting summary generation")
-        # summary = get_summary(transcript)
+        summary = get_summary(transcript)
         logger.info("Summary generation completed: " + json.dumps(summary)[:100])
 
         logger.info("Starting takeaways extraction")
-        # takeAways = get_takeaways(transcript, 5)
+        takeAways = get_takeaways(transcript, 5)
         logger.info("Takeaways extraction completed: " + json.dumps(takeAways)[:100])
 
         logger.info("Starting quotes extraction")
@@ -87,7 +87,7 @@ def handler(event, context):
         logger.info("Quotes extraction completed: " + json.dumps(quotes)[:100])
         
         logger.info("Starting tags extraction")
-        # tags = get_tags(transcript, "tags.json")
+        tags = get_tags(transcript, "tags.json")
         logger.info("Tags extraction completed: " + json.dumps(tags)[:100])
         
         logger.info("Starting fact checking")
