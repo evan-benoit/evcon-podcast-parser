@@ -5,9 +5,13 @@ import os
 import time
 import random
 import botocore
+import logging
 
 
 bedrock = boto3.client("bedrock-runtime", region_name="us-east-1")
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 def handler(event, context):
     transcript = event.get("transcript")
@@ -16,6 +20,9 @@ def handler(event, context):
             "statusCode": 400,
             "body": json.dumps({"error": "Transcript not provided"})
         }
+    
+    # log the length and first 100 letters of the transcript
+    logger.info(f"Received transcript of length {len(transcript)}, excerpt: {json.dumps(transcript)[:100]}")
     
     try:
         # set all return values to blank/defaults
@@ -43,7 +50,7 @@ def handler(event, context):
         }
     except Exception as e:
         # Log stack trace for debugging and return a 500 to the caller
-        print(traceback.format_exc())
+        logger.error(traceback.format_exc())
         return {
             "statusCode": 500,
             "body": json.dumps({"error": "Internal server error", "message": str(e)})
@@ -300,7 +307,7 @@ def invoke_model(prompt, retries=5):
         except botocore.exceptions.ClientError as e:
             if e.response["Error"]["Code"] == "ThrottlingException":
                 sleep_time = (2 ** i) + random.random()
-                print(f"[WARN] Throttled on attempt {i+1}/{retries}. Sleeping {sleep_time:.2f}s...")
+                logger.warning(f"Throttled on attempt {i+1}/{retries}. Sleeping {sleep_time:.2f}s...")
                 time.sleep(sleep_time)
                 continue
             else:
