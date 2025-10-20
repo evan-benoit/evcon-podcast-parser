@@ -32,11 +32,25 @@ def handler(event, context):
         tags = {}
         factChecks = {}
 
+        logger.info("Starting summary generation")
         summary = get_summary(transcript)
+        logger.info("Summary generation completed: " + json.dumps(summary)[:100])
+
+        logger.info("Starting takeaways extraction")
         # takeAways = get_takeaways(transcript, 5)
+        logger.info("Takeaways extraction completed: " + json.dumps(takeAways)[:100])
+
+        logger.info("Starting quotes extraction")
         # quotes = get_quotes(transcript, 2)
+        logger.info("Quotes extraction completed: " + json.dumps(quotes)[:100])
+        
+        logger.info("Starting tags extraction")
         # tags = get_tags(transcript, "tags.json")
+        logger.info("Tags extraction completed: " + json.dumps(tags)[:100])
+        
+        logger.info("Starting fact checking")
         # factChecks = fact_check(transcript)
+        logger.info("Fact checking completed: " + json.dumps(factChecks)[:100])
 
         returnJson = {"summary": summary, 
                     "takeAways": takeAways, 
