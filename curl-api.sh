@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Usage: ./call_api.sh input.json
 
-API_ENDPOINT="https://wv6a8lyes5.execute-api.us-east-2.amazonaws.com/parse_transcript"
+API_ENDPOINT="https://xxxxxxxx.execute-api.us-east-2.amazonaws.com/parse_transcript"
 
 if [ $# -ne 1 ]; then
   echo "Usage: $0 <input-file>"
