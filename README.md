@@ -12,10 +12,12 @@ This project is an AWS Lambda function that ingests podcast transcripts, validat
 
 ## 🗂️ Project Structure
 
-- src/lambda/hello/index.py   # Main Lambda handler
-- tf/                         # Terraform for deploying Lambda
-- sample/                     # Sample JSON files 
-- sample/output               # Generated outputs
+| Path                        | Description                 |
+|-----------------------------|-----------------------------|
+| `src/lambda/hello/index.py` | Main Lambda handler         |
+| `tf/`                       | Terraform for deploying Lambda |
+| `sample/`                   | Sample JSON files            |
+| `sample/output`             | Generated outputs            |
 
 
 ## ⚙️ Prerequisites
