@@ -14,7 +14,8 @@ This project is an AWS Lambda function that ingests podcast transcripts, validat
 
 - src/lambda/hello/index.py   # Main Lambda handler
 - tf/                         # Terraform for deploying Lambda
-- sample/                     # Sample JSON files and their generated outputs
+- sample/                     # Sample JSON files 
+- sample/output               # Generated outputs
 
 
 ## ⚙️ Prerequisites
