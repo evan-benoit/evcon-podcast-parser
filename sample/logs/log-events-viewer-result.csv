@@ -1,0 +1,58 @@
+timestamp,message
+1761003638848,"INIT_START Runtime Version: python:3.11.v97	Runtime Version ARN: arn:aws:lambda:us-east-2::runtime:6c687d1ae05d783a82cd99c5896c1baddfe1daf7ac4068082fb989401de8b287
+"
+1761003639741,"START RequestId: 7ac6d365-076e-483d-a33d-37b34f58c392 Version: $LATEST
+"
+1761003639741,"[INFO]	2025-10-20T23:40:39.741Z	7ac6d365-076e-483d-a33d-37b34f58c392	Received transcript of length 3502, excerpt: ""{
+  \""episode_id\"": \""ep002\"",
+  \""title\"": \""AI in Healthcare: Hype or Reality?\"",
+  \""host\"": 
+"
+1761003639742,"[INFO]	2025-10-20T23:40:39.741Z	7ac6d365-076e-483d-a33d-37b34f58c392	Starting summary generation
+"
+1761003645431,"[INFO]	2025-10-20T23:40:45.431Z	7ac6d365-076e-483d-a33d-37b34f58c392	Summary generation completed: ""The podcast episode \""AI in Healthcare: Hype or Reality?\"" explores the current state and future po
+"
+1761003645431,"[INFO]	2025-10-20T23:40:45.431Z	7ac6d365-076e-483d-a33d-37b34f58c392	Starting takeaways extraction
+"
+1761003649664,"[INFO]	2025-10-20T23:40:49.664Z	7ac6d365-076e-483d-a33d-37b34f58c392	Takeaways extraction completed: [""AI is being used in healthcare for assistive tasks like reading X-rays and triaging patients, but 
+"
+1761003649664,"[INFO]	2025-10-20T23:40:49.664Z	7ac6d365-076e-483d-a33d-37b34f58c392	Starting quotes extraction
+"
+1761003651464,"[INFO]	2025-10-20T23:40:51.464Z	7ac6d365-076e-483d-a33d-37b34f58c392	Quotes extraction completed: [{""timestamp"": ""01:50"", ""speaker"": ""Dr. Priya"", ""text"": ""Smart triage chatbots on hospital websites 
+"
+1761003651464,"[INFO]	2025-10-20T23:40:51.464Z	7ac6d365-076e-483d-a33d-37b34f58c392	Starting tags extraction
+"
+1761003653041,"[INFO]	2025-10-20T23:40:53.041Z	7ac6d365-076e-483d-a33d-37b34f58c392	Tags extraction completed: {""tags"": [""Healthcare"", ""Medicine"", ""Diagnostics"", ""AI Ethics"", ""AI Governance"", ""AI Regulation"", ""A
+"
+1761003653041,"[INFO]	2025-10-20T23:40:53.041Z	7ac6d365-076e-483d-a33d-37b34f58c392	Starting fact checking
+"
+1761003655225,"[INFO]	2025-10-20T23:40:55.224Z	7ac6d365-076e-483d-a33d-37b34f58c392	Fact-checking claim: AI is everywhere, but in healthcare it's complicated.
+"
+1761003656111,"[INFO]	2025-10-20T23:40:56.111Z	7ac6d365-076e-483d-a33d-37b34f58c392	Verification result: {'claim': ""AI is everywhere, but in healthcare it's complicated."", 'verification': 'Possibly outdated/inaccurate', 'confidence': 0.8, 'source': 'https://www.nature.com/articles/d41586-021-00434-6'}
+"
+1761003656111,"[INFO]	2025-10-20T23:40:56.111Z	7ac6d365-076e-483d-a33d-37b34f58c392	Fact-checking claim: Some hospitals use AI for reading X-rays or flagging urgent cases.
+"
+1761003656918,"[INFO]	2025-10-20T23:40:56.918Z	7ac6d365-076e-483d-a33d-37b34f58c392	Verification result: {'claim': 'Some hospitals use AI for reading X-rays or flagging urgent cases.', 'verification': 'Verified true', 'confidence': 0.8, 'source': 'https://www.nature.com/articles/d41586-019-00693-8'}
+"
+1761003656918,"[INFO]	2025-10-20T23:40:56.918Z	7ac6d365-076e-483d-a33d-37b34f58c392	Fact-checking claim: The FDA reviews these systems carefully, so full autonomy isn't happening anytime soon.
+"
+1761003657751,"[INFO]	2025-10-20T23:40:57.751Z	7ac6d365-076e-483d-a33d-37b34f58c392	Verification result: {'claim': ""The FDA reviews these systems carefully, so full autonomy isn't happening anytime soon."", 'verification': 'Possibly outdated/inaccurate', 'confidence': 0.7, 'source': 'https://www.fda.gov/medical-devices/digital-health-center-excellence/artificial-intelligence-and-machine-learning-software-medical-devices'}
+"
+1761003657751,"[INFO]	2025-10-20T23:40:57.751Z	7ac6d365-076e-483d-a33d-37b34f58c392	Fact-checking claim: Smart triage chatbots on hospital websites or apps, helping patients figure out next steps before seeing a doctor.
+"
+1761003658669,"[INFO]	2025-10-20T23:40:58.669Z	7ac6d365-076e-483d-a33d-37b34f58c392	Verification result: {'claim': 'Smart triage chatbots on hospital websites or apps, helping patients figure out next steps before seeing a doctor.', 'verification': 'Verified true', 'confidence': 0.9, 'source': 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6436330/'}
+"
+1761003658669,"[INFO]	2025-10-20T23:40:58.669Z	7ac6d365-076e-483d-a33d-37b34f58c392	Fact-checking claim: The pandemic accelerated digital health adoption, including AI tools.
+"
+1761003659650,"[INFO]	2025-10-20T23:40:59.650Z	7ac6d365-076e-483d-a33d-37b34f58c392	Verification result: {'claim': 'The pandemic accelerated digital health adoption, including AI tools.', 'verification': 'Verified true', 'confidence': 0.9, 'source': 'https://www.mckinsey.com/industries/healthcare-systems-and-services/our-insights/how-covid-19-has-pushed-companies-over-the-technology-tipping-point-and-transformed-business-forever'}
+"
+1761003659650,"[INFO]	2025-10-20T23:40:59.650Z	7ac6d365-076e-483d-a33d-37b34f58c392	Fact-checking claim: AI copilots that suggest treatment plans, but a human will always make the final call.
+"
+1761003660513,"[INFO]	2025-10-20T23:41:00.513Z	7ac6d365-076e-483d-a33d-37b34f58c392	Verification result: {'claim': 'AI copilots that suggest treatment plans, but a human will always make the final call.', 'verification': 'Verified true', 'confidence': 0.9, 'source': 'https://www.fda.gov/medical-devices/software-medical-device-samd/artificial-intelligence-and-machine-learning-software-medical-device'}
+"
+1761003660513,"[INFO]	2025-10-20T23:41:00.513Z	7ac6d365-076e-483d-a33d-37b34f58c392	Fact checking completed: {""facts"": [{""claim"": ""AI is everywhere, but in healthcare it's complicated."", ""verification"": ""Possi
+"
+1761003660515,"END RequestId: 7ac6d365-076e-483d-a33d-37b34f58c392
+"
+1761003660516,"REPORT RequestId: 7ac6d365-076e-483d-a33d-37b34f58c392	Duration: 20774.22 ms	Billed Duration: 21664 ms	Memory Size: 512 MB	Max Memory Used: 83 MB	Init Duration: 889.35 ms	
+"
